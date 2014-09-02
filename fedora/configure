@@ -1,0 +1,80 @@
+#!/bin/bash
+#
+# Description: Configurations for my Vagrant Development Environment
+
+###############################################
+# Sends all error messages to stderr
+#
+# Globals:
+#  - none
+# Arguments:
+#  - none
+# Returns:
+#  - none
+#
+###############################################
+function err() {
+  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] ERROR: $@" >&2
+  exit 1
+}
+
+# Directories
+declare -r OPT_DIR='/opt'
+declare -r APPS_DIR="${OPT_DIR}/apps"
+declare -r SUBLIME_ROOT="${APPS_DIR}/sublime"
+declare -r SUBLIME_HOME="${SUBLIME_DIR}/sublime"
+declare -r SUBLIME_PACKAGE_SETTINGS_DIR="~/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings"
+declare -a dir=("${SUBLIME_ROOT}")
+
+# Define apps to be installed by yum
+declare -a rpms=('meld' 'vim' 'git' 'ruby' 'libcanberra-gtk3-module' 'xorg-x11-font*')
+declare -a dirs=("${SUBLIME_HOME}")
+
+# Create Directories
+for i in ${dirs[@]}; do
+  mkdir -p "/opt/apps/${i}"
+  if [[ $? -ne 0 ]]; then
+    err "An error occurred attempting to create the directory ${i}."
+  fi
+done
+
+# Yum Update
+yum -y update
+if [[ $? -ne 0 ]]; then
+  err "An error occurred attempting to run a yum update."
+fi
+
+# Intall any yum items
+for i in ${rpms[@]}; do
+  yum -y install $i
+  if [[ $? -ne 0 ]]; then
+    err "An error occurred attempting to install ${i} with yum."
+  fi
+done
+
+# Install Java
+#if [[ ! -f jdk-7u60-linux-x64.rpm ]]; then
+#  wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/7u60-b19/jdk-7u60-linux-x64.rpm"
+#  [[ $? -ne 0 ]] && err "An error occurred attempting to download Java."
+#fi
+#rpm -Uvh jdk-7u60-linux-x64.rpm
+#[[ $? -ne 0 ]] && err "An error occurred attempting to install Java."
+#rm -f jdk-7u60-linux-x64.rpm
+#echo "export JAVA_HOME=\"/usr/java/default/bin\"" >> /etc/profile.d/java.sh
+#echo "export JAVA_PATH=\"$JAVA_HOME\"" >> /etc/profile.d/java.sh
+#echo "export PATH=\"$PATH:$JAVA_HOME\"" >> /etc/profile.d/java.sh
+
+# Install Sublime
+#if [[ ! -f sublime.tar.bz2 ]]; then
+ # wget http://c758482.r82.cf2.rackcdn.com/sublime_text_3_build_3065_x64.tar.bz2 -O sublime.tar.bz2
+  tar -jxvf sublime.tar.bz2 -C "${SUBLIME_ROOT}"
+  ln -s "/opt/apps/sublime/sublime_text_3" /opt/apps/sublime/sublime
+  wget https://sublime.wbond.net/Package%20Control.sublime-package -O "${}
+#fi
+# Create link
+
+# Install Intellij
+
+# Install Eclipse
+
+# Install Chrome
