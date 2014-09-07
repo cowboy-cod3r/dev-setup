@@ -21,18 +21,90 @@ function err() {
 # Directories
 declare -r OPT_DIR='/opt'
 declare -r APPS_DIR="${OPT_DIR}/apps"
+declare -r VAGRANT_HOME="/home/vagrant"
 declare -r SUBLIME_ROOT="${APPS_DIR}/sublime"
-declare -r SUBLIME_HOME="${SUBLIME_DIR}/sublime"
-declare -r SUBLIME_PACKAGE_SETTINGS_DIR="~/.config/sublime-text-3/Packages/User/Package\ Control.sublime-settings"
-declare -a dir=("${SUBLIME_ROOT}")
+declare -r SUBLIME_HOME="${SUBLIME_ROOT}/sublime_text_3"
+declare -r SUBLIME_PACKAGE_SETTINGS_DIR="${VAGRANT_HOME}/.config/sublime-text-3/Packages/User"
+declare -r SUBLIME_INSTALLED_PKG_DIR="${VAGRANT_HOME}/.config/sublime-text-3/Installed Packages"
+declare -a dirs=("${SUBLIME_ROOT}")
 
 # Define apps to be installed by yum
-declare -a rpms=('meld' 'vim' 'git' 'ruby' 'libcanberra-gtk3-module' 'xorg-x11-font*')
-declare -a dirs=("${SUBLIME_HOME}")
+declare -a rpms=(\
+  'meld' \
+  'vim' \
+  'git' \
+  'gitflow' \
+  'ruby' \
+  'xorg-x11-server-Xvfb' \
+  'libcanberra-gtk3' \
+  'xorg-x11-font*' \
+  'sil-abyssinica-fonts' \
+  'google-noto-sans-tagalog-fonts' \
+  'libreoffice-opensymbol-fonts' \
+  'google-crosextra-caladea-fonts' \
+  'ghostscript-fonts' \
+  'gnu-free-sans-fonts' \
+  'jomolhari-fonts' \
+  'abattis-cantarell-fonts' \
+  'sil-nuosu-fonts' \
+  'google-noto-sans-tai-tham-fonts' \
+  'liberation-fonts-common' \
+  'dejavu-sans-fonts' \
+  'lohit-gujarati-fonts' \
+  'liberation-narrow-fonts' \
+  'lohit-tamil-fonts' \
+  'nhn-nanum-fonts-common' \
+  'dejavu-sans-mono-fonts' \
+  'thai-scalable-waree-fonts' \
+  'stix-fonts' \
+  'lohit-oriya-fonts' \
+  'lohit-assamese-fonts' \
+  'lohit-bengali-fonts' \
+  'liberation-mono-fonts' \
+  'gnu-free-mono-fonts' \
+  'khmeros-base-fonts' \
+  'tabish-eeyek-fonts' \
+  'google-noto-sans-mandaic-fonts' \
+  'gnu-free-fonts-common' \
+  'dejavu-serif-fonts' \
+  'wqy-zenhei-fonts' \
+  'gnu-free-serif-fonts' \
+  'smc-meera-fonts' \
+  'terminus-fonts' \
+  'google-crosextra-carlito-fonts' \
+  'google-noto-sans-lisu-fonts' \
+  'xorg-x11-fonts-Type1' \
+  'lklug-fonts' \
+  'lohit-telugu-fonts' \
+  'dejavu-fonts-common' \
+  'liberation-serif-fonts' \
+  'sil-mingzat-fonts' \
+  'google-noto-sans-meeteimayek-fonts' \
+  'khmeros-fonts-common' \
+  'vlgothic-fonts' \
+  'urw-fonts' \
+  'liberation-sans-fonts' \
+  'sil-padauk-fonts' \
+  'nhn-nanum-gothic-fonts' \
+  'thai-scalable-fonts-common' \
+  'smc-fonts-common' \
+  'xorg-x11-fonts-misc' \
+  'paratype-pt-sans-fonts' \
+  'paktype-naqsh-fonts' \
+  'cjkuni-uming-fonts' \
+  'levien-inconsolata-fonts' \
+  'google-noto-sans-tai-viet-fonts' \
+  'lohit-kannada-fonts' \
+  'lohit-punjabi-fonts'
+)
+
+# Did these separate because they have a space in the name (which screws with looping)
+[[ -d "${SUBLIME_PACKAGE_SETTINGS_DIR}" ]] || mkdir -p "${SUBLIME_PACKAGE_SETTINGS_DIR}"
+[[ -d "${SUBLIME_INSTALLED_PKG_DIR}" ]] || mkdir -p "${SUBLIME_INSTALLED_PKG_DIR}"
 
 # Create Directories
 for i in ${dirs[@]}; do
-  mkdir -p "/opt/apps/${i}"
+  mkdir -p "${i}"
   if [[ $? -ne 0 ]]; then
     err "An error occurred attempting to create the directory ${i}."
   fi
@@ -53,25 +125,45 @@ for i in ${rpms[@]}; do
 done
 
 # Install Java
-#if [[ ! -f jdk-7u60-linux-x64.rpm ]]; then
-#  wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/7u60-b19/jdk-7u60-linux-x64.rpm"
-#  [[ $? -ne 0 ]] && err "An error occurred attempting to download Java."
-#fi
-#rpm -Uvh jdk-7u60-linux-x64.rpm
-#[[ $? -ne 0 ]] && err "An error occurred attempting to install Java."
-#rm -f jdk-7u60-linux-x64.rpm
-#echo "export JAVA_HOME=\"/usr/java/default/bin\"" >> /etc/profile.d/java.sh
-#echo "export JAVA_PATH=\"$JAVA_HOME\"" >> /etc/profile.d/java.sh
-#echo "export PATH=\"$PATH:$JAVA_HOME\"" >> /etc/profile.d/java.sh
+rpm -qa | grep jdk
+if [[ $? -ne 0 ]]; then
+  wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/7u60-b19/jdk-7u60-linux-x64.rpm"
+  [[ $? -ne 0 ]] && err "An error occurred attempting to download Java."
+  rpm -Uvh jdk-7u60-linux-x64.rpm
+  [[ $? -ne 0 ]] && err "An error occurred attempting to install Java."
+  rm -f jdk-7u60-linux-x64.rpm
+  echo "export JAVA_HOME=\"/usr/java/default/bin\"" >> /etc/profile.d/java.sh
+  echo "export JAVA_PATH=\"$JAVA_HOME\"" >> /etc/profile.d/java.sh
+  echo "export PATH=\"$PATH:$JAVA_HOME\"" >> /etc/profile.d/java.sh
+fi
 
 # Install Sublime
-#if [[ ! -f sublime.tar.bz2 ]]; then
- # wget http://c758482.r82.cf2.rackcdn.com/sublime_text_3_build_3065_x64.tar.bz2 -O sublime.tar.bz2
+if [[ ! -d /opt/apps/sublime/sublime_text_3 ]]; then
+  wget http://c758482.r82.cf2.rackcdn.com/sublime_text_3_build_3065_x64.tar.bz2 -O sublime.tar.bz2
   tar -jxvf sublime.tar.bz2 -C "${SUBLIME_ROOT}"
-  ln -s "/opt/apps/sublime/sublime_text_3" /opt/apps/sublime/sublime
-  wget https://sublime.wbond.net/Package%20Control.sublime-package -O "${}
-#fi
-# Create link
+  chown -R vagrant:vagrant "${SUBLIME_ROOT}"
+  ln -s "${SUBLIME_HOME}" /opt/apps/sublime/sublime
+  wget https://sublime.wbond.net/Package%20Control.sublime-package -O "${SUBLIME_INSTALLED_PKG_DIR}/Package Control.sublime-package"
+fi
+
+# Sublime Configs
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Base File.sublime-settings" "/home/vagrant/.config/sublime-text-3/Packages/User/Base File.sublime-settings"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/CTags.sublime-settings" "/home/vagrant/.config/sublime-text-3/Packages/User/CTags.sublime-settings"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Default (Linux).sublime-keymap" "/home/vagrant/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Flatland Monokai (SL).tmTheme" "/home/vagrant/.config/sublime-text-3/Packages/User/Flatland Monokai (SL).tmTheme"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Gist.sublime-settings" "/home/vagrant/.config/sublime-text-3/Packages/User/Gist.sublime-settings"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/MarkdownEditor-Dark (SL).tmTheme" "/home/vagrant/.config/sublime-text-3/Packages/User/MarkdownEditor-Dark (SL).tmTheme"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Monokai (SL).tmTheme" "/home/vagrant/.config/sublime-text-3/Packages/User/Monokai (SL).tmTheme"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Package Control.last-run" "/home/vagrant/.config/sublime-text-3/Packages/User/Package Control.last-run"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Package Control.sublime-settings" "/home/vagrant/.config/sublime-text-3/Packages/User/Package Control.sublime-settings"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/predawn (SL).tmTheme" "/home/vagrant/.config/sublime-text-3/Packages/User/predawn (SL).tmTheme"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Preferences.sublime-settings" "/home/vagrant/.config/sublime-text-3/Packages/User/Preferences.sublime-settings"
+cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Solarized (Dark) (SL).tmTheme" "/home/vagrant/.config/sublime-text-3/Packages/User/Solarized (Dark) (SL).tmTheme"
+
+
+
+
+chown -R vagrant:vagrant "${VAGRANT_HOME}"
 
 # Install Intellij
 
