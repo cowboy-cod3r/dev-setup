@@ -30,6 +30,7 @@ declare -a dirs=("${SUBLIME_ROOT}")
 
 # Define apps to be installed by yum
 declare -a rpms=(\
+  'npm' \
   'meld' \
   'vim' \
   'git' \
@@ -159,9 +160,6 @@ cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Package Control.sublime-se
 cp -rp "/vagrant/configs/sublime-text-3/Packages/User/predawn (SL).tmTheme" "/home/vagrant/.config/sublime-text-3/Packages/User/predawn (SL).tmTheme"
 cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Preferences.sublime-settings" "/home/vagrant/.config/sublime-text-3/Packages/User/Preferences.sublime-settings"
 cp -rp "/vagrant/configs/sublime-text-3/Packages/User/Solarized (Dark) (SL).tmTheme" "/home/vagrant/.config/sublime-text-3/Packages/User/Solarized (Dark) (SL).tmTheme"
-
-
-
 
 chown -R vagrant:vagrant "${VAGRANT_HOME}"
 
